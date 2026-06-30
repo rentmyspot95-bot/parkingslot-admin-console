@@ -31,9 +31,11 @@ In dev, API calls to `/api/**` are proxied to `VITE_API_PROXY_TARGET` (see `vite
 
 ## Deployment
 
-Containerised static SPA — see [DEPLOY.md](./DEPLOY.md) for Railway steps. Key
-gotcha: `VITE_*` vars are inlined at **build** time, so set `VITE_API_BASE_URL`
-(your absolute admin API origin) as a Railway variable and redeploy to change it.
+Containerised static SPA — see [DEPLOY.md](./DEPLOY.md) for Railway steps. Deploy
+it two ways: as a **backendless demo** (`VITE_USE_MOCK=true` → serves in-memory
+fixtures, login `admin@parkingslot.com` / `admin`) or against a **real admin API**
+(`VITE_API_BASE_URL`). Key gotcha: `VITE_*` vars are inlined at **build** time, so
+changing one requires a redeploy, not just a restart.
 
 ## Architecture
 

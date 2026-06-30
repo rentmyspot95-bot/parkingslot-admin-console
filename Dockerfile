@@ -12,8 +12,11 @@ COPY . .
 
 # Public, build-time config. Vite inlines VITE_* at build, so these MUST be set
 # during `npm run build` (Railway passes service variables as build args because
-# they are declared as ARG below). Set VITE_API_BASE_URL to your absolute admin
-# API origin, e.g. https://api.parkingslot.com/api/v1/admin
+# they are declared as ARG below).
+#   • Backendless DEMO: set VITE_USE_MOCK=true — the app serves itself from
+#     in-memory fixtures (login admin@parkingslot.com / admin), no API needed.
+#   • Real API: set VITE_USE_MOCK=false and VITE_API_BASE_URL to your absolute
+#     admin API origin, e.g. https://api.parkingslot.com/api/v1/admin
 ARG VITE_API_BASE_URL=/api/v1/admin
 ARG VITE_ENV_NAME=production
 ARG VITE_USE_MOCK=false

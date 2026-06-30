@@ -8,38 +8,49 @@ survive a refresh). Deployment is containerised via the [`Dockerfile`](./Dockerf
 ## ⚠️ The one thing to know: env vars are baked in at BUILD time
 
 Vite inlines every `VITE_*` variable into the JS bundle **when it builds** — not
-when the container starts. So `VITE_API_BASE_URL` must be set as a Railway
-variable **before/at build**, and **changing it requires a redeploy** (a plain
-restart won't pick up a new value). The `Dockerfile` declares these as `ARG`, and
-Railway passes service variables as Docker build args, so setting them in the
-Railway dashboard is all you need.
+when the container starts. So these must be set as Railway variables
+**before/at build**, and **changing one requires a redeploy** (a plain restart
+won't pick up a new value). The `Dockerfile` declares them as `ARG`, and Railway
+passes service variables as Docker build args, so setting them in the Railway
+dashboard is all you need.
 
-## Steps (GitHub → Railway dashboard)
+## Option A — Demo deploy, no backend (recommended if the admin API isn't built yet)
+
+The console can serve itself entirely from in-memory fixtures, so the Railway URL
+is a fully clickable demo with sample data across every module. No API, no CORS.
 
 1. **Push this repo to GitHub** (see "Commit & push" below).
+2. Railway → **New Project → Deploy from GitHub repo** → pick this repo.
+   Railway detects the `Dockerfile`/`railway.json` and builds. (Root Directory = repo root.)
+3. **Service → Variables**, then **redeploy**:
+   | Variable | Value |
+   | --- | --- |
+   | `VITE_USE_MOCK` | `true` ← serves the in-memory fixtures |
+   | `VITE_ENV_NAME` | `staging` (top-bar badge; it's a demo, not real prod) |
 
-2. **Create the project on Railway**
-   - Railway dashboard → **New Project → Deploy from GitHub repo** → pick this repo.
-   - Railway detects the `Dockerfile` / `railway.json` and starts the first build.
-   - (Root Directory: leave as the repo root — the `Dockerfile` lives there.)
+   Don't set `PORT` (Railway injects it) and don't bother with `VITE_API_BASE_URL`
+   (the mock intercepts API calls before they hit the network).
+4. **Settings → Networking → Generate Domain** to get the public URL.
+5. Open it and **log in with `admin@parkingslot.com` / `admin`** (any TOTP code).
+   That demo admin holds all permissions, so every module is visible.
 
-3. **Set service variables** (Service → **Variables**), then **redeploy**:
+When the real admin API later exists, switch to Option B (flip `VITE_USE_MOCK` to
+`false`, set `VITE_API_BASE_URL`, redeploy).
+
+## Option B — Real admin API
+
+1–2. Same as above (push + create the Railway project).
+3. **Service → Variables**, then **redeploy**:
    | Variable | Value |
    | --- | --- |
    | `VITE_API_BASE_URL` | Your absolute admin API origin, e.g. `https://api.parkingslot.com/api/v1/admin` |
-   | `VITE_ENV_NAME` | `production` (or `staging`) — shown on the top-bar badge |
-   | `VITE_USE_MOCK` | `false` (the mock only ever runs in dev anyway) |
+   | `VITE_ENV_NAME` | `production` |
+   | `VITE_USE_MOCK` | `false` |
    | `VITE_SENTRY_DSN` | optional |
+4. **Settings → Networking → Generate Domain**.
+5. Open the domain and sign in with a real admin account (`email + password + TOTP`).
 
-   Do **not** set `PORT` — Railway injects it and the server binds to it automatically.
-
-4. **Expose it** — Service → **Settings → Networking → Generate Domain**. Railway
-   gives you a `*.up.railway.app` URL (add a custom domain there if you have one).
-
-5. **Open the domain.** You'll get the login screen. Sign in with a real admin
-   account from your backend (`email + password + TOTP`).
-
-## Backend requirements (real API)
+### Backend requirements (Option B only)
 
 Because the console runs on a Railway domain and calls your API on a **different
 origin**, the admin API must:
