@@ -1,0 +1,18 @@
+# Keep the build context small and deterministic.
+node_modules
+dist
+.git
+.gitignore
+
+# Never bake local env into the image — config comes from Railway build args.
+.env
+.env.*
+!.env.example
+
+# Tooling / editor / docs not needed for the build
+.claude
+*.log
+npm-debug.log*
+*.tsbuildinfo
+ParkingSlot_Admin_Console_Design_Doc.md
+README.md
