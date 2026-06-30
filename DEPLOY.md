@@ -83,5 +83,6 @@ git push -u origin HEAD
 
 ```bash
 docker build --build-arg VITE_API_BASE_URL=https://api.parkingslot.com/api/v1/admin -t admin-console .
-docker run -p 8080:8080 admin-console   # → http://localhost:8080
+docker run -e PORT=8080 -p 8080:8080 admin-console   # → http://localhost:8080
+# (without PORT, serve listens on 3000)
 ```

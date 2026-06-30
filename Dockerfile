@@ -38,6 +38,8 @@ RUN npm install -g serve@14
 
 COPY --from=build /app/dist ./dist
 
-# Railway injects $PORT; default to 8080 for local `docker run`.
-EXPOSE 8080
-CMD ["sh", "-c", "serve -s dist -l ${PORT:-8080}"]
+# `serve` binds to the PORT env var when no --listen flag is given (Railway
+# injects PORT). Avoid shell var-substitution in the command so it works even
+# when the runner doesn't expand ${PORT}. Defaults to 3000 for local `docker run`.
+EXPOSE 3000
+CMD ["serve", "-s", "dist"]
